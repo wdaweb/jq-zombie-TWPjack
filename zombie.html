@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    body{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    #game {
+      width: 350px;
+      height: 350px;
+      background: green;
+      overflow: hidden;
+      position: relative;
+      cursor: url(./cursor_white.png) 50 50, auto;
+    }
+    #game img {
+      position: absolute;
+      height: 150px;
+    }
+    .panel {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+  <div id="game"></div>
+  <div class="panel">
+  <input type="button" value="開始遊戲" id="btn-start">
+  <input type="button" value="結束遊戲">
+  <p>分數: <span id="text-score">0</span> 分</p>
+  <p>剩餘: <span id="text-time">30</span> 秒</p>
+  <br>
+  <h1>待開發?????</h1>
+  </div>
+</div>
+  <script src="./jquery-3.5.1.js"></script>
+  <script>
+    let score = 0
+    let timeleft = 30
+
+    // 殭屍流水號
+    let id = 0
+
+    const rand = (num) => {
+      return Math.floor(Math.random()*num)
+    }
+
+    const movezombie = (id) => {
+      $(`#zombie${id}`).animate({
+        left: rand(70) + "%",
+        top: rand(70) + "%"
+      }, 3000, function(){
+        movezombie(id)
+      })
+    }
+
+    $('#btn-start').click(function(){
+      // 停用開始按鈕
+      $(this).attr('disabled', true)
+
+      // 重設
+      score = 0
+      $('#text-score').text(score)
+      timeleft = 5
+      $('#text-time').text(timeleft)
+
+      let timer = setInterval(function(){
+        // 修改秒數
+        timeleft--
+        $('#text-time').text(timeleft)
+
+        if(timeleft === 0) {
+          clearInterval(timer)
+          $('#btn-start').attr('disabled', false)
+          $('#game img').remove()
+          // setTimeout(() => {}, 50)
+        } else {
+          // 每秒隨機出現殭屍
+          if(rand(10) > 5) {
+            $('#game').append(`<img src="./ghost.png" id="zombie${id}">`)
+            $(`#zombie${id}`).css({
+              left: rand(70) + "%",
+              top: rand(70) + "%"
+            })
+            movezombie(id)
+            id++
+          }
+        }
+
+      }, 1000)
+    })
+
+    $("#game").on('click', 'img', function(){
+      $(this).attr('src', './blood.png')
+      $(this).stop(true, false)
+      $(this).css('pointer-events', 'none')
+      score++
+      $('#text-score').text(score)
+    })
+  </script>
+</body>
+</html>
